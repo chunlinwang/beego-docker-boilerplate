@@ -1,0 +1,57 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  app:
+    build:
+      context: docker/beego
+    volumes:
+      - ./app:/var/app
+      - logvolume01:/var/log
+      - logvolume02:/var/app/var/log
+    tty: true
+    depends_on:
+      - redis
+    networks:
+      - app
+
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - "80:80"
+    networks:
+      - app
+    volumes:
+      - ./app:/var/app:ro
+      - ./docker/nginx/conf.d/app.conf:/etc/nginx/conf.d/app.conf
+
+  redis:
+    image: redis:6-alpine
+    volumes:
+      - redisdata:/data:delegated
+    ports:
+      - "6379:6379"
+    networks:
+      - app
+
+  postgres:
+    image: postgres:14-alpine3.14
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: beego
+      POSTGRES_USER: beego
+      POSTGRES_DB: beego
+    volumes:
+      - pgdata:/var/lib/postgresql/data:delegated
+    networks:
+      - app
+
+networks:
+  app: {}
+  elastic: {}
+
+volumes:
+  logvolume01: { }
+  logvolume02: { }
+  redisdata: { }
+  pgdata: { }
