@@ -2,11 +2,12 @@ package main
 
 import (
 	_ "app/routers"
-	_ "github.com/lib/pq"
-	_ "github.com/beego/beego/v2/server/web/session/redis"
-	"github.com/beego/beego/v2/server/web"
+
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
+	_ "github.com/beego/beego/v2/server/web/session/redis"
+	_ "github.com/lib/pq"
 )
 
 

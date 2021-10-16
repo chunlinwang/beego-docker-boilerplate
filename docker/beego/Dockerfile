@@ -2,10 +2,11 @@
 ARG GOLANG_VERSION=1.17.2
 ARG ALPINE_VERSION=3.14
 
-FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS base
+FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 RUN set -eux \
   && apk update && apk --no-cache add \
+    ca-certificates \
     postgresql-dev \
     libzip-dev \
     git \
@@ -20,24 +21,22 @@ RUN set -eux \
 	rabbitmq-c \
 	rabbitmq-c-dev
 
-# Init user
-RUN addgroup -g 2000 -S app && adduser -G app -u 2000 -s /bin/bash -S app && sed -i "s/2000/2000/" /etc/group
+# Install beego & bee
+RUN go get github.com/beego/bee && bee update
 
-# Configure Timezone
-RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
-    echo "Europe/Paris" > /etc/timezone
+RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.42.1
 
-RUN mkdir -p /var/app
+RUN golangci-lint --version
+
+# Godep for vendoring
+RUN go get github.com/tools/godep
+
+# Recompile the standard library without CGO
+RUN CGO_ENABLED=0 go install -a std
+
 WORKDIR /var/app
 
-RUN chown app: -R /var/app
-
-USER app
-
-# Install beego & bee
-RUN go get github.com/astaxie/beego
-RUN go get github.com/beego/bee
-
-#CMD ["bee", "run"]
-
 EXPOSE 8081
+
+FROM builder AS prod
+CMD ["bee", "run"]

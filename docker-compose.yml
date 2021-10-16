@@ -1,8 +1,9 @@
-version: "3.9"  # optional since v1.27.0
+version: "3.9"
 services:
   app:
     build:
       context: docker/beego
+      target: builder
     volumes:
       - ./app:/var/app
       - logvolume01:/var/log
@@ -17,11 +18,11 @@ services:
     build: ./docker/nginx
     ports:
       - "80:80"
-    networks:
-      - app
+    tty: true
     volumes:
       - ./app:/var/app:ro
-      - ./docker/nginx/conf.d/app.conf:/etc/nginx/conf.d/app.conf
+    networks:
+      - app
 
   redis:
     image: redis:6-alpine
@@ -48,7 +49,6 @@ services:
 
 networks:
   app: {}
-  elastic: {}
 
 volumes:
   logvolume01: { }

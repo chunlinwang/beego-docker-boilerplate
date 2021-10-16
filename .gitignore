@@ -177,3 +177,4 @@ DerivedData/
 ## Gcc Patch
 /*.gcno
 
+*/vendor/
