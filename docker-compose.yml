@@ -5,10 +5,12 @@ services:
       context: docker/beego
       target: builder
     volumes:
-      - ./app:/var/app
+      - ./app:/app
       - logvolume01:/var/log
       - logvolume02:/var/app/var/log
     tty: true
+    ports:
+      - 8081:8081
     depends_on:
       - redis
     networks:

@@ -34,7 +34,7 @@ RUN go get github.com/tools/godep
 # Recompile the standard library without CGO
 RUN CGO_ENABLED=0 go install -a std
 
-WORKDIR /var/app
+WORKDIR /app
 
 EXPOSE 8081
 

@@ -1,9 +1,11 @@
 package controllers
 
 import (
-	"app/security"
+	// "app/security"
 	"github.com/beego/beego/v2/server/web"
-	"strings"
+	"github.com/beego/beego/v2/core/logs"
+
+	// "strings"
 )
 
 const (
@@ -15,17 +17,19 @@ type BaseController struct {
 }
 
 func (c *BaseController) Prepare() {
-	bearerToken := c.Ctx.Request.Header.Get(Authorization)
-	token := strings.Fields(bearerToken)
-	claims, isValid := security.Valid(token[1])
+	logs.Info("user", c)
 
-	if !isValid {
-		c.Data["json"] = map[string]interface{}{"error": "jwt is not valid"}
-		c.ServeJSON()
-		c.StopRun()
-	}
+	// bearerToken := c.Ctx.Request.Header.Get(Authorization)
+	// token := strings.Fields(bearerToken)
+	// claims, isValid := security.Valid(token[1])
 
-	c.Data["iss"] = claims["iss"]
+	// if !isValid {
+	// 	c.Data["json"] = map[string]interface{}{"error": "jwt is not valid"}
+	// 	c.ServeJSON()
+	// 	c.StopRun()
+	// }
+
+	// c.Data["iss"] = claims["iss"]
 }
 
 func (c *BaseController) Finish() {

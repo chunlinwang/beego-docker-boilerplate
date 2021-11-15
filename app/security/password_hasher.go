@@ -2,13 +2,14 @@ package security
 
 import (
 "crypto/rand"
-"fmt"
-"log"
+// "encoding/base64"
+// "fmt"
+// "log"
 
 "golang.org/x/crypto/argon2"
 )
 
-type params struct {
+type argon2Param struct {
 	memory      uint32
 	iterations  uint32
 	parallelism uint8
@@ -16,44 +17,32 @@ type params struct {
 	keyLength   uint32
 }
 
-//func init() {}
-
 func init() {
-	// Establish the parameters to use for Argon2.
-	p := &params{
-		memory:      64 * 1024,
-		iterations:  3,
-		parallelism: 2,
-		saltLength:  16,
-		keyLength:   32,
-	}
-
-	// Pass the plaintext password and parameters to our generateFromPassword
-	// helper function.
-	hash, err := generateFromPassword("password123", p)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(hash)
+	// b64Salt := base64.RawStdEncoding.EncodeToString(salt)
+	// b64Hash := base64.RawStdEncoding.EncodeToString(hash)
+	// fmt.Println(b64Salt)
+	// fmt.Println(b64Hash)
 }
 
-func generateFromPassword(password string, p *params) (hash []byte, err error) {
-	// Generate a cryptographically secure random salt.
-	salt, err := generateRandomBytes(p.saltLength)
-	if err != nil {
-		return nil, err
-	}
+func GetArgon2Param() (*argon2Param) {
+	return &argon2Param{
+			memory:      64 * 1024,
+			iterations:  3,
+			parallelism: 2,
+			saltLength:  32,
+			keyLength:   64,
+		}
+}
 
-	// Pass the plaintext password, salt and parameters to the argon2.IDKey
-	// function. This will generate a hash of the password using the Argon2id
-	// variant.
-	hash = argon2.IDKey([]byte(password), salt, p.iterations, p.memory, p.parallelism, p.keyLength)
+func GenerateFromPassword(password string, salt []byte) (hash []byte, err error) {
+	c := GetArgon2Param();
 
+	hash = argon2.IDKey([]byte(password), salt, c.iterations, c.memory, c.parallelism, c.keyLength)
+ 
 	return hash, nil
 }
 
-func generateRandomBytes(n uint32) ([]byte, error) {
+func GenerateRandomBytes(n uint32) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	if err != nil {
